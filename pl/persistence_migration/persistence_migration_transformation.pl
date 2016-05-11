@@ -13,6 +13,7 @@ user:ct( replaceDAOCallforBusinessCall(CallId),   % HEAD
 		paramT(Param, Constructor, EM, 'em'),
 		%classT(EM1, _, 'EntityManager', _, _),
 		fieldT(Field, Business1, EM, 'em', null),
+		%paramT(Params, MethodCalled, _, _),
 		%getFieldT(GetField, _, _, _, Field),
 		%fieldAccessT(FieldAccess,NewNew,NewMethod,null,Field,EM),
 		%fieldT(Field, GenericDAO1, EM, 'em', null),
@@ -20,10 +21,10 @@ user:ct( replaceDAOCallforBusinessCall(CallId),   % HEAD
       new_id(ModifierP),
       new_id(NewBlock),
       %new_id(NewExec),
-      %new_id(NewReturn),
-      %new_id(NewCall),
+      new_id(NewReturn),
+      new_id(NewCall),
       new_id(NewNew),
-      %new_id(NewDAO)
+      %new_id(NewParam),
       new_id(NewFieldAccess),
       new_id(NewIdent),
       new_id(NewLocal)
@@ -32,15 +33,15 @@ user:ct( replaceDAOCallforBusinessCall(CallId),   % HEAD
     	add(fieldAccessT(NewFieldAccess,_,_,_,Field,_)),
     	add( methodT(NewMethod, Business1, MethodCalledName, MethodCalledParameters, MethodCalledReturnType, MethodCalledExceptions, [], NewBlock) ),
     	add( modifierT(ModifierP, NewMethod, public)),
-    	add(blockT(NewBlock, NewMethod, NewMethod, [NewLocal])),
+    	add(blockT(NewBlock, NewMethod, NewMethod, [NewLocal, NewReturn])),
     	add(localT(NewLocal, NewBlock, NewMethod, DAO1, 'unidadeOrganizacionalDAO', NewNew)),
     	add(newT(NewNew,NewLocal,NewMethod,null,[NewFieldAccess],Constructor,[],DAO1,null)),
     	%add(fieldAccessT(NewFieldAccess, NewLocal, NewMethod, NewIdent, MethodCalled, DAO1)),
-    	%add(identT(NewIdent, NewFieldAccess, NewMethod, NewLocal)),
     	
-    	%add(returnT(NewReturn,NewBlock,NewMethod,NewCall)),
+    	add(returnT(NewReturn,NewBlock,NewMethod,NewCall)),
     	%add(execT(NewExec, NewBlock, NewMethod, NewCall)),
-    	%add(callT(NewCall,NewBlock,NewMethod,NewIdent,MethodCalledParameters,MethodCalledName,_,MethodCalled)),
+    	add(callT(NewCall,NewReturn,NewMethod,NewIdent,MethodCalledParameters,MethodCalled,[],null)),
+    	add(identT(NewIdent, _, _, NewLocal)),
     	%add(identT(NewIdent, NewBlock, NewMethod, NewLocal)),
     	
     	

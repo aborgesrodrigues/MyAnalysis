@@ -4,7 +4,7 @@
 
 user:ct( addEJBAnnotation(CallId, DAOClass, BusinessClass, GenericClass),   % HEAD
     (                                                   % CONDITION
-      persistence_migration_analysis:persistence_call(CallId, MethodCalled, MethodCalledName, MethodCalledParameters, MethodCalledReturnType, MethodCalledExceptions, DAO, Business, DAOClass, BusinessClass, GenericClass),
+      persistence_migration_analysis:persistence_call(CallId, MethodCalled, MethodCalledName, MethodCalledParameters, MethodCalledReturnType, MethodCalledExceptions, CallParameters, DAO, Business, DAOClass, BusinessClass, GenericClass),
 		fully_qualified_name(BusinessTarget, BusinessClass),
 		fully_qualified_name(EJB, 'javax.ejb.EJB'),
 		classT(BusinessTarget, _, NameBusinessTarget, _, _),
@@ -31,7 +31,7 @@ user:ct( addEJBAnnotation(CallId, DAOClass, BusinessClass, GenericClass),   % HE
 
 user:ct( replaceDAOCallforBusinessCall(CallId, DAOClass, BusinessClass, GenericClass),   % HEAD
     (                                                   % CONDITION
-      persistence_migration_analysis:persistence_call(CallId, MethodCalled, MethodCalledName, MethodCalledParameters, MethodCalledReturnType, MethodCalledExceptions, DAO, Business, DAOClass, BusinessClass, GenericClass),
+      persistence_migration_analysis:persistence_call(CallId, MethodCalled, MethodCalledName, MethodCalledParameters, MethodCalledReturnType, MethodCalledExceptions, CallParameters, DAO, Business, DAOClass, BusinessClass, GenericClass),
 		fully_qualified_name(BusinessTarget, BusinessClass),
 		%fully_qualified_name(DAO1, 'org.sigaept.edu.dao.UnidadeOrganizacionalDAO'),
 		%fully_qualified_name(GenericDAO1, 'org.sigaept.nucleo.dao.GenericDAO'),
@@ -71,13 +71,13 @@ user:ct( replaceDAOCallforBusinessCall(CallId, DAOClass, BusinessClass, GenericC
     	
     	add(returnT(NewReturn,NewBlock,NewMethod,NewCall)),
     	%add(execT(NewExec, NewBlock, NewMethod, NewCall)),
-    	add(callT(NewCall,NewReturn,NewMethod,NewNew,[NewIdent],MethodCalled,[],null)),
+    	add(callT(NewCall,NewReturn,NewMethod,NewNew,CallParameters,MethodCalled,[],null)),
     	%add(literalT(NewLiteral, NewCall, NewMethod, IntType, '1')),
     	%add(identT(NewIdent, _, _, NewLocal)),
     	%add(identT(NewIdent, NewBlock, NewMethod, NewLocal)),
     	
-    	add(localT(NewLocal, NewBlock, NewMethod, IntType, 'teste', null)),
-    	add(identT(NewIdent, _, _, NewLocal)),%MethodCalledParameters
+    	%add(localT(NewLocal, NewBlock, NewMethod, IntType, 'teste', null)),
+    	%add(identT(NewIdent, _, _, NewLocal)),%MethodCalledParameters
     	
 	    add_to_class(BusinessTarget,NewMethod)
     )

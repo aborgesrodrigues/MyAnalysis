@@ -2,17 +2,47 @@
 
 :- multifile(user:ct/3).     % Don't forget the declaration!
 
-user:ct( replaceDAOCallforBusinessCall(CallId),   % HEAD
+user:ct( addEJBAnnotation(CallId, DAOClass, BusinessClass, GenericClass),   % HEAD
     (                                                   % CONDITION
-      persistence_migration_analysis:persistence_call(CallId, MethodCalled, MethodCalledName, MethodCalledParameters, MethodCalledReturnType, MethodCalledExceptions, Business, 'org.sigaept.edu.dao.UnidadeOrganizacionalDAO', 'org.sigaept.edu.negocio.ejb.ManterDiarioClasseEJB', 'org.sigaept.nucleo.dao.GenericDAO'),
-		fully_qualified_name(Business1, 'org.sigaept.edu.negocio.ejb.ManterDiarioClasseEJB'),
-		fully_qualified_name(DAO1, 'org.sigaept.edu.dao.UnidadeOrganizacionalDAO'),
-		fully_qualified_name(GenericDAO1, 'org.sigaept.nucleo.dao.GenericDAO'),
+      persistence_migration_analysis:persistence_call(CallId, MethodCalled, MethodCalledName, MethodCalledParameters, MethodCalledReturnType, MethodCalledExceptions, DAO, Business, DAOClass, BusinessClass, GenericClass),
+		fully_qualified_name(BusinessTarget, BusinessClass),
+		fully_qualified_name(EJB, 'javax.ejb.EJB'),
+		classT(BusinessTarget, _, NameBusinessTarget, _, _),
+		not(fieldT(_, Business, _, NameBusinessTarget, null)),
+		
+      %annotatedT(NewFieldEJB, NewAnnotationEJB),
+      
+      new_id(NewFieldEJB),
+      new_id(NewAnnotationEJB),
+      new_id(ModifierPrivate)
+    ),
+    (    
+		add(fieldT(NewFieldEJB, Business, BusinessTarget, NameBusinessTarget, null)),
+		add(modifierT(ModifierPrivate, NewFieldEJB, private)),
+		add(annotationT(NewAnnotationEJB, NewFieldEJB, Business, EJB, [])),
+		%add(markerAnnotationT(NewAnnotationEJB)),
+		%annotatedT(NewFieldEJB, NewAnnotationEJB),
+		%add_to_class(BusinessTarget, NewAnnotationEJB),
+		add_to_class(Business, NewFieldEJB)
+    
+    )
+).
+
+
+user:ct( replaceDAOCallforBusinessCall(CallId, DAOClass, BusinessClass, GenericClass),   % HEAD
+    (                                                   % CONDITION
+      persistence_migration_analysis:persistence_call(CallId, MethodCalled, MethodCalledName, MethodCalledParameters, MethodCalledReturnType, MethodCalledExceptions, DAO, Business, DAOClass, BusinessClass, GenericClass),
+		fully_qualified_name(BusinessTarget, BusinessClass),
+		%fully_qualified_name(DAO1, 'org.sigaept.edu.dao.UnidadeOrganizacionalDAO'),
+		%fully_qualified_name(GenericDAO1, 'org.sigaept.nucleo.dao.GenericDAO'),
 		fully_qualified_name(EM, 'javax.persistence.EntityManager'),
-		constructorT(Constructor, DAO1, [Param], _, _, _),
+		%fully_qualified_name(EJB, 'javax.ejb.EJB'),
+		constructorT(Constructor, DAO, [Param], _, _, _),
 		paramT(Param, Constructor, EM, 'em'),
 		%classT(EM1, _, 'EntityManager', _, _),
-		fieldT(Field, Business1, EM, 'em', null),
+		fieldT(Field, BusinessTarget, EM, 'em', null),
+		basicTypeT(IntType, int),
+		
 		%paramT(Params, MethodCalled, _, _),
 		%getFieldT(GetField, _, _, _, Field),
 		%fieldAccessT(FieldAccess,NewNew,NewMethod,null,Field,EM),
@@ -30,39 +60,25 @@ user:ct( replaceDAOCallforBusinessCall(CallId),   % HEAD
       new_id(NewLocal)
     ),
     (    
+    
     	add(fieldAccessT(NewFieldAccess,_,_,_,Field,_)),
-    	add( methodT(NewMethod, Business1, MethodCalledName, MethodCalledParameters, MethodCalledReturnType, MethodCalledExceptions, [], NewBlock) ),
+    	add( methodT(NewMethod, BusinessTarget, MethodCalledName, MethodCalledParameters, MethodCalledReturnType, MethodCalledExceptions, [], NewBlock) ),
     	add( modifierT(ModifierP, NewMethod, public)),
-    	add(blockT(NewBlock, NewMethod, NewMethod, [NewLocal, NewReturn])),
-    	add(localT(NewLocal, NewBlock, NewMethod, DAO1, 'unidadeOrganizacionalDAO', NewNew)),
-    	add(newT(NewNew,NewLocal,NewMethod,null,[NewFieldAccess],Constructor,[],DAO1,null)),
+    	add(blockT(NewBlock, NewMethod, NewMethod, [NewReturn])),
+    	%add(localT(NewLocal, NewBlock, NewMethod, DAO1, 'unidadeOrganizacionalDAO', NewNew)),
+    	add(newT(NewNew,NewBlock,NewMethod,null,[NewFieldAccess],Constructor,[],DAO,null)),
     	%add(fieldAccessT(NewFieldAccess, NewLocal, NewMethod, NewIdent, MethodCalled, DAO1)),
     	
     	add(returnT(NewReturn,NewBlock,NewMethod,NewCall)),
     	%add(execT(NewExec, NewBlock, NewMethod, NewCall)),
-    	add(callT(NewCall,NewReturn,NewMethod,NewIdent,MethodCalledParameters,MethodCalled,[],null)),
-    	add(identT(NewIdent, _, _, NewLocal)),
+    	add(callT(NewCall,NewReturn,NewMethod,NewNew,[NewIdent],MethodCalled,[],null)),
+    	%add(literalT(NewLiteral, NewCall, NewMethod, IntType, '1')),
+    	%add(identT(NewIdent, _, _, NewLocal)),
     	%add(identT(NewIdent, NewBlock, NewMethod, NewLocal)),
     	
+    	add(localT(NewLocal, NewBlock, NewMethod, IntType, 'teste', null)),
+    	add(identT(NewIdent, _, _, NewLocal)),%MethodCalledParameters
     	
-    	%add(execT(NewExec, NewBlock, NewMethod, NewCall)),
-		%add(returnT(NewReturn,NewBlock,NewMethod,NewCall)),
-		%add(callT(NewCall, NewReturn, NewMethod, _, _, _, _)),
-		%add(callT(NewCall,NewReturn,NewMethod,NewNew,[NewIdent],MethodCalled,_,MethodCalledReturnType)),
-		%add(newT(NewNew,NewCall,NewMethod,null,[NewFieldAccess],Constructor,_,DAO1,null)),
-		%add(fieldAccessT(NewFieldAccess,NewNew,NewMethod,null,Field,EM)),
-		%add(identT(NewIdent,NewReturn,NewMethod,ParamT)),
-    
-    
-    
-                                                                     % TRANSFORMATION:
-%	    add( methodT(NewMethod, Business1, MethodCalledName, MethodCalledParameters, MethodCalledReturnType, MethodCalledExceptions, [], NewBlock) ),
-%	    add( modifierT(ModifierP, NewMethod, public)),
-%	    add(returnT(NewReturn,NewBlock,NewMethod,NewCall)),
-%	    add(blockT(NewBlock, NewMethod, NewMethod, [NewExec])),
-%	    add(execT(NewExec, NewBlock, NewMethod, NewCall)),
-%	    add(newT(NewDAO, _, NewMethod, null, [], null, [], DAO1, null)),
-%	    add(callT(NewCall, NewExec, NewMethod, _, _, _, _)),
-	    add_to_class(Business1,NewMethod)
+	    add_to_class(BusinessTarget,NewMethod)
     )
 ).

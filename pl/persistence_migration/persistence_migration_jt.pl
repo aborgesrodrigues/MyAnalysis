@@ -1,7 +1,7 @@
 :- module(persistence_migration_jt, []).
 
 % load analysis and transformation
-:- use_module(persistence_migration_analysis, [ persistence_call/12 ]).
+:- use_module(persistence_migration_analysis, [ persistence_call/13 ]).
 :- use_module(persistence_migration_transformation, []).
 
 % The predicate analysis_definition/5 logically belongs to the
@@ -30,7 +30,7 @@ analysis_api:analysis_definition(
 
 analysis_api:analysis_result('persistence_call', _, Result) :-  
 	% Call the System.out.println detector that you implemented: 
-	persistence_call(CallId, MethodCalled, MethodCalledName, MethodCalledParameters, MethodCalledReturnType, MethodCalledExceptions, CallParameters, DAO, Business, 'org.sigaept.edu.dao.UnidadeOrganizacionalDAO', 'org.sigaept.edu.negocio.ejb.ManterDiarioClasseEJB', 'org.sigaept.nucleo.dao.GenericDAO') , 
+	persistence_call(CallId, MethodCall, MethodCalled, MethodCalledName, MethodCalledParameters, MethodCalledReturnType, MethodCalledExceptions, CallParameters, DAO, Business, 'org.sigaept.edu.dao.UnidadeOrganizacionalDAO', 'org.sigaept.edu.negocio.ejb.ManterDiarioClasseEJB', 'org.sigaept.nucleo.dao.GenericDAO') , 
 	% Create a description 
 	Description = 'Call to DAO', 
 	% Wrap everything into a result term for the GUI: 

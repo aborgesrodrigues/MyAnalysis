@@ -1,7 +1,7 @@
-:- module(persistence_migration_analysis, [ persistence_call/12 ]).
+:- module(persistence_migration_analysis, [ persistence_call/13 ]).
 
 %% sysout_call(CallId, CallParent, Enclosing, FieldAccess, StaticTypeRef, Argument)
-persistence_call(CallId, MethodCalled, MethodCalledName, MethodCalledParameters, MethodCalledReturnType, MethodCalledExceptions, CallParameters, DAO, Business, DAOClass, BusinessClass, GenericDAOClass) :-
+persistence_call(CallId, MethodCall, MethodCalled, MethodCalledName, MethodCalledParameters, MethodCalledReturnType, MethodCalledExceptions, CallParameters, DAO, Business, DAOClass, BusinessClass, GenericDAOClass) :-
   callT(CallId, _, MethodCall, _, CallParameters, MethodCalled, _, _),
   methodT(MethodCalled, DAO, MethodCalledName, MethodCalledParameters, MethodCalledReturnType, MethodCalledExceptions, _, _),
   fully_qualified_name(DAO,DAOClass),

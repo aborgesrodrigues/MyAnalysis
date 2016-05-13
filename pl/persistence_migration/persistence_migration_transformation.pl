@@ -4,7 +4,7 @@
 
 user:ct( addEJBAnnotation(CallId, DAOClass, BusinessClass, GenericClass),   % HEAD
     (                                                   % CONDITION
-      persistence_migration_analysis:persistence_call(CallId, MethodCalled, MethodCalledName, MethodCalledParameters, MethodCalledReturnType, MethodCalledExceptions, CallParameters, DAO, Business, DAOClass, BusinessClass, GenericClass),
+      persistence_migration_analysis:persistence_call(CallId, MethodCall, MethodCalled, MethodCalledName, MethodCalledParameters, MethodCalledReturnType, MethodCalledExceptions, CallParameters, DAO, Business, DAOClass, BusinessClass, GenericClass),
 		fully_qualified_name(BusinessTarget, BusinessClass),
 		fully_qualified_name(EJB, 'javax.ejb.EJB'),
 		classT(BusinessTarget, _, NameBusinessTarget, _, _),
@@ -31,7 +31,7 @@ user:ct( addEJBAnnotation(CallId, DAOClass, BusinessClass, GenericClass),   % HE
 
 user:ct( replaceDAOCallforBusinessCall(CallId, DAOClass, BusinessClass, GenericClass),   % HEAD
     (                                                   % CONDITION
-      persistence_migration_analysis:persistence_call(CallId, MethodCalled, MethodCalledName, MethodCalledParameters, MethodCalledReturnType, MethodCalledExceptions, CallParameters, DAO, Business, DAOClass, BusinessClass, GenericClass),
+      persistence_migration_analysis:persistence_call(CallId, MethodCall, MethodCalled, MethodCalledName, MethodCalledParameters, MethodCalledReturnType, MethodCalledExceptions, CallParameters, DAO, Business, DAOClass, BusinessClass, GenericClass),
 		fully_qualified_name(BusinessTarget, BusinessClass),
 		%fully_qualified_name(DAO1, 'org.sigaept.edu.dao.UnidadeOrganizacionalDAO'),
 		%fully_qualified_name(GenericDAO1, 'org.sigaept.nucleo.dao.GenericDAO'),
@@ -41,7 +41,10 @@ user:ct( replaceDAOCallforBusinessCall(CallId, DAOClass, BusinessClass, GenericC
 		paramT(Param, Constructor, EM, 'em'),
 		%classT(EM1, _, 'EntityManager', _, _),
 		fieldT(Field, BusinessTarget, EM, 'em', null),
-		basicTypeT(IntType, int),
+		
+		classT(BusinessTarget, _, NameBusinessTarget, _, _),
+		fieldT(FieldEJB, Business, BusinessTarget, NameBusinessTarget, null),
+		%callT(CallId, Parent, Encl, Expr, Args, Method, TypeParams , Type)
 		
 		%paramT(Params, MethodCalled, _, _),
 		%getFieldT(GetField, _, _, _, Field),
@@ -50,14 +53,13 @@ user:ct( replaceDAOCallforBusinessCall(CallId, DAOClass, BusinessClass, GenericC
       new_id(NewMethod),                                % NewTypeRefis a yet unused ID
       new_id(ModifierP),
       new_id(NewBlock),
-      %new_id(NewExec),
+      new_id(ModifierPrivate),
       new_id(NewReturn),
       new_id(NewCall),
       new_id(NewNew),
-      %new_id(NewParam),
+      new_id(NewCallEJB),
       new_id(NewFieldAccess),
-      new_id(NewIdent),
-      new_id(NewLocal)
+      new_id(NewGetFieldEJB)
     ),
     (    
     
@@ -72,13 +74,16 @@ user:ct( replaceDAOCallforBusinessCall(CallId, DAOClass, BusinessClass, GenericC
     	add(returnT(NewReturn,NewBlock,NewMethod,NewCall)),
     	%add(execT(NewExec, NewBlock, NewMethod, NewCall)),
     	add(callT(NewCall,NewReturn,NewMethod,NewNew,CallParameters,MethodCalled,[],null)),
-    	%add(literalT(NewLiteral, NewCall, NewMethod, IntType, '1')),
-    	%add(identT(NewIdent, _, _, NewLocal)),
-    	%add(identT(NewIdent, NewBlock, NewMethod, NewLocal)),
     	
-    	%add(localT(NewLocal, NewBlock, NewMethod, IntType, 'teste', null)),
-    	%add(identT(NewIdent, _, _, NewLocal)),%MethodCalledParameters
-    	
-	    add_to_class(BusinessTarget,NewMethod)
+	    add_to_class(BusinessTarget,NewMethod),
+	    
+	    add(fieldAccessT(NewGetFieldEJB,_,_,_,FieldEJB,_)),
+	    %add_to_class(Business,NewGetFieldEJB),
+	    add(callT(NewCallEJB,_,MethodCall,NewGetFieldEJB,CallParameters,MethodCalled,[],null)),
+	        %replace(modifierT(ModifierMethodCall, MethodCall, public),
+            %	modifierT(ModifierMethodCall, MethodCall, private))
+	    %add_to_class(Business,NewCallEJB)
+	    replace(callT(CallId, Parent, Encl, Expr, Args, Method, TypeParams, Type), 
+	    		callT(CallId, Parent, Encl, NewGetFieldEJB, Args, Method, TypeParams, Type))
     )
 ).

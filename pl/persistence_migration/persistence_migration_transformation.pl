@@ -40,6 +40,10 @@ user:ct( replaceDAOCallforBusinessCall(CallId, DAO, Business, BusinessTarget, Ge
 		classT(BusinessTarget, _, NameBusinessTarget, _, _),
 		fieldT(FieldEJB, Business, BusinessTarget, NameBusinessTarget, null),
 		not(basicTypeT(MethodCalledReturnType, void)),
+%		callT(CallId, _, _, ExprToDelete, _, _, _, _),
+%		identT(ExprToDelete, _, _, LocalToDelete),
+%		get_term(ExprToDelete, ExprTermToDelete),
+%		get_term(LocalToDelete, LocalTermToDelete),
       new_id(NewMethod),                                % NewTypeRefis a yet unused ID
       new_id(ModifierP),
       new_id(NewBlock),
@@ -65,12 +69,12 @@ user:ct( replaceDAOCallforBusinessCall(CallId, DAO, Business, BusinessTarget, Ge
 	    add_to_class(BusinessTarget,NewMethod),
 	    
 	    add(fieldAccessT(NewGetFieldEJB,_,_,_,FieldEJB,_)),
-
-	    add(callT(NewCallEJB,_,MethodCall,NewGetFieldEJB,CallParameters,MethodCalled,[],null)),
-
+	    
 	    replace(callT(CallId, Parent, Encl, Expr, Args, Method, TypeParams, Type), 
 	    		callT(CallId, Parent, Encl, NewGetFieldEJB, Args, Method, TypeParams, Type))
-	    %delete(localT(Expr, _, _, _, _, _))
+
+	    %delete(ExprTermToDelete),
+	    %delete(LocalTermToDelete)		
     )
 ).
 
@@ -86,6 +90,7 @@ user:ct( replaceVoidDAOCallforVoidusinessCall(CallId, DAO, Business, BusinessTar
 		classT(BusinessTarget, _, NameBusinessTarget, _, _),
 		fieldT(FieldEJB, Business, BusinessTarget, NameBusinessTarget, null),
 		basicTypeT(MethodCalledReturnType, void),
+		
       new_id(NewMethod),                                % NewTypeRefis a yet unused ID
       new_id(ModifierP),
       new_id(NewBlock),
@@ -104,14 +109,13 @@ user:ct( replaceVoidDAOCallforVoidusinessCall(CallId, DAO, Business, BusinessTar
 
     	add(newT(NewNew,NewBlock,NewMethod,null,[NewFieldAccess],Constructor,[],DAO,null)),
 
-    	%add(returnT(NewReturn,NewBlock,NewMethod,NewCall)),
     	add(callT(NewCall,NewBlock,NewMethod,NewNew,CallParameters,MethodCalled,[],null)),
     	
 	    add_to_class(BusinessTarget,NewMethod),
 	    
 	    add(fieldAccessT(NewGetFieldEJB,_,_,_,FieldEJB,_)),
 
-	    add(callT(NewCallEJB,_,MethodCall,NewGetFieldEJB,CallParameters,MethodCalled,[],null)),
+	    %add(callT(NewCallEJB,_,MethodCall,NewGetFieldEJB,CallParameters,MethodCalled,[],null)),
 
 	    replace(callT(CallId, Parent, Encl, Expr, Args, Method, TypeParams, Type), 
 	    		callT(CallId, Parent, Encl, NewGetFieldEJB, Args, Method, TypeParams, Type))

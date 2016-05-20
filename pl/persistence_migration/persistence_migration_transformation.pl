@@ -35,25 +35,19 @@ user:ct( replaceDAOCallforBusinessCall(CallId, DAO, Business, BusinessTarget, Ge
 		fully_qualified_name(GenericCrudEJB, 'org.sigaept.nucleo.ejb.GenericCrudEJB'),
 		constructorT(Constructor, DAO, [Param], _, _, _),
 		paramT(Param, Constructor, EM, 'em'),
-		fieldT(Field, GenericCrudEJB, EM, 'em', null),% ; fieldT(Field, BusinessTarget, EM, 'em', null)),
+		fieldT(Field, BusinessTarget, EM, _, null), 
 		
 		classT(BusinessTarget, _, NameBusinessTarget, _, _),
 		fieldT(FieldEJB, Business, BusinessTarget, NameBusinessTarget, null),
 		not(basicTypeT(MethodCalledReturnType, void)),
-%		callT(CallId, _, _, ExprToDelete, _, _, _, _),
-%		identT(ExprToDelete, _, _, LocalToDelete),
-%		get_term(ExprToDelete, ExprTermToDelete),
-%		get_term(LocalToDelete, LocalTermToDelete),
-      new_id(NewMethod),                                % NewTypeRefis a yet unused ID
-      new_id(ModifierP),
-      new_id(NewBlock),
-      new_id(ModifierPrivate),
-      new_id(NewReturn),
-      new_id(NewCall),
-      new_id(NewNew),
-      new_id(NewCallEJB),
-      new_id(NewFieldAccess),
-      new_id(NewGetFieldEJB)
+		new_id(NewMethod),                                % NewTypeRefis a yet unused ID
+		new_id(ModifierP),
+		new_id(NewBlock),
+		new_id(NewReturn),
+		new_id(NewCall),
+		new_id(NewNew),
+		new_id(NewFieldAccess),
+		new_id(NewGetFieldEJB)
     ),
     (    
     	add(fieldAccessT(NewFieldAccess,_,_,_,Field,_)),
@@ -70,11 +64,19 @@ user:ct( replaceDAOCallforBusinessCall(CallId, DAO, Business, BusinessTarget, Ge
 	    
 	    add(fieldAccessT(NewGetFieldEJB,_,_,_,FieldEJB,_)),
 	    
-	    replace(callT(CallId, Parent, Encl, Expr, Args, Method, TypeParams, Type), 
+	    replace(callT(CallId, Parent, Encl, ExprToDelete, Args, Method, TypeParams, Type), 
 	    		callT(CallId, Parent, Encl, NewGetFieldEJB, Args, Method, TypeParams, Type))
-
-	    %delete(ExprTermToDelete),
-	    %delete(LocalTermToDelete)		
+	    %add(identT(ExprToDelete, _, _, LocalToDelete)),
+	    %add(get_term(LocalToDelete, LocalToDeleteTerm)),
+	    %delete(fieldAccessT(NewGetFieldEJB,_,_,_,FieldEJB,_))
+	    %addToBlock(NewBlock, LocalToDelete)
+	    %deepRetract(LocalToDelete)
+	    %delete(ExprToDeleteTerm)
+		%delete(identT(ExprToDelete, _, _, LocalToDelete)),
+		%delete(LocalTermToDelete)
+	    %delete(ParentToDeleteTerm),
+	    %delete(ExprTermToDelete)
+	    %delete(callT(CallId, _, _, ExprToDelete, _, _, _, _))
     )
 ).
 
@@ -85,7 +87,7 @@ user:ct( replaceVoidDAOCallforVoidusinessCall(CallId, DAO, Business, BusinessTar
 		fully_qualified_name(GenericCrudEJB, 'org.sigaept.nucleo.ejb.GenericCrudEJB'),
 		constructorT(Constructor, DAO, [Param], _, _, _),
 		paramT(Param, Constructor, EM, 'em'),
-		fieldT(Field, GenericCrudEJB, EM, 'em', null),% ; fieldT(Field, BusinessTarget, EM, 'em', null)),
+		fieldT(Field, GenericCrudEJB, EM, _, null),% ; fieldT(Field, BusinessTarget, EM, 'em', null)),
 		
 		classT(BusinessTarget, _, NameBusinessTarget, _, _),
 		fieldT(FieldEJB, Business, BusinessTarget, NameBusinessTarget, null),
@@ -94,10 +96,8 @@ user:ct( replaceVoidDAOCallforVoidusinessCall(CallId, DAO, Business, BusinessTar
       new_id(NewMethod),                                % NewTypeRefis a yet unused ID
       new_id(ModifierP),
       new_id(NewBlock),
-      new_id(ModifierPrivate),
       new_id(NewCall),
       new_id(NewNew),
-      new_id(NewCallEJB),
       new_id(NewFieldAccess),
       new_id(NewGetFieldEJB)
     ),
@@ -119,5 +119,16 @@ user:ct( replaceVoidDAOCallforVoidusinessCall(CallId, DAO, Business, BusinessTar
 
 	    replace(callT(CallId, Parent, Encl, Expr, Args, Method, TypeParams, Type), 
 	    		callT(CallId, Parent, Encl, NewGetFieldEJB, Args, Method, TypeParams, Type))
+    )
+).
+
+user:ct( deleteLocalVariable(CallId),   % HEAD
+    (                                                   % CONDITION
+		callT(CallId, _, MethodAux, ExprToDelete, _, _, _, _),
+		%methodT(MethodAux, _, _, _, _, _, BlockAux),
+		get_term(ExprToDelete, ExprToDeleteTerm)
+    ),
+    (    
+	    delete(ExprToDeleteTerm)
     )
 ).

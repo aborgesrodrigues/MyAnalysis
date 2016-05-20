@@ -23,16 +23,6 @@ analysis_api:analysis_definition(
 
 
 analysis_api:analysis_result('persistence_call', _, Result) :-  
-persistence_call(CallId, MethodCall, MethodCalled, MethodCalledName, MethodCalledParameters, MethodCalledReturnType, MethodCalledExceptions, CallParameters, DAO, Business, NotBusiness, GenericDAO, 'org.sigaept.edu.dao.CalendarioAcademicoDAO', 'org.sigaept.edu.negocio.ejb.ManterClasseEJB', 'org.sigaept.nucleo.dao.GenericDAO') , 
-Description = 'Call to DAO', 
-make_result_term(persistence_call(CallId, MethodCall, MethodCalled, MethodCalledName, MethodCalledParameters, MethodCalledReturnType, MethodCalledExceptions, CallParameters, DAO, Business, NotBusiness, GenericDAO), Description, Result).
-
-analysis_api:analysis_result('persistence_call', _, Result) :-  
-persistence_call(CallId, MethodCall, MethodCalled, MethodCalledName, MethodCalledParameters, MethodCalledReturnType, MethodCalledExceptions, CallParameters, DAO, Business, NotBusiness, GenericDAO, 'org.sigaept.edu.dao.UnidadeOrganizacionalDAO', 'org.sigaept.edu.negocio.ejb.ManterDiarioClasseEJB', 'org.sigaept.nucleo.dao.GenericDAO') , 
-Description = 'Call to DAO', 
-make_result_term(persistence_call(CallId, MethodCall, MethodCalled, MethodCalledName, MethodCalledParameters, MethodCalledReturnType, MethodCalledExceptions, CallParameters, DAO, Business, NotBusiness, GenericDAO), Description, Result).
-
-analysis_api:analysis_result('persistence_call', _, Result) :-  
 persistence_call(CallId, MethodCall, MethodCalled, MethodCalledName, MethodCalledParameters, MethodCalledReturnType, MethodCalledExceptions, CallParameters, DAO, Business, NotBusiness, GenericDAO, 'org.sigaept.edu.dao.EnturmacaoDAO', 'org.sigaept.edu.negocio.ejb.VincularAlunoAClasseEJB', 'org.sigaept.nucleo.dao.GenericDAO') , 
 Description = 'Call to DAO', 
 make_result_term(persistence_call(CallId, MethodCall, MethodCalled, MethodCalledName, MethodCalledParameters, MethodCalledReturnType, MethodCalledExceptions, CallParameters, DAO, Business, NotBusiness, GenericDAO), Description, Result).
@@ -50,6 +40,8 @@ transformation_api:transformation(
      persistence_call(CallId, MethodCall, MethodCalled, MethodCalledName, MethodCalledParameters, MethodCalledReturnType, MethodCalledExceptions, CallParameters, DAO, Business, NotBusiness, GenericDAO),                 % RoleTerm
      [addEJBAnnotation(CallId, DAO, Business, NotBusiness, GenericDAO), 
       replaceDAOCallforBusinessCall(CallId, DAO, Business, NotBusiness, GenericDAO, MethodCall, MethodCalled, MethodCalledName, MethodCalledParameters, MethodCalledReturnType, MethodCalledExceptions, CallParameters),
-      replaceVoidDAOCallforVoidusinessCall(CallId, DAO, Business, NotBusiness, GenericDAO, MethodCall, MethodCalled, MethodCalledName, MethodCalledParameters, MethodCalledReturnType, MethodCalledExceptions, CallParameters)],         % CTHead
+      replaceVoidDAOCallforVoidusinessCall(CallId, DAO, Business, NotBusiness, GenericDAO, MethodCall, MethodCalled, MethodCalledName, MethodCalledParameters, MethodCalledReturnType, MethodCalledExceptions, CallParameters)
+      %deleteLocalVariable(CallId)
+      ],         % CTHead
      'Replace DAO call for EJB call',      % Description
      [global, preview]).                               % Option: Show Preview

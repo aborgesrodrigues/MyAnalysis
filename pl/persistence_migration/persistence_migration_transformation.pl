@@ -4,7 +4,7 @@
 
 user:ct( addEJBAnnotation(CallId, DAO, Business, BusinessTarget, GenericDAO),   % HEAD
     (                                                   % CONDITION
-		persistence_migration_analysis:persistence_call(CallId, MethodCall, Receiver, Local, _, _, _, _, _, _, DAO, Business, NotBusiness, GenericDAO, 'org.sigaept.edu.dao.EnturmacaoDAO', 'org.sigaept.edu.negocio.ejb.VincularAlunoAClasseEJB', 'org.sigaept.nucleo.dao.GenericDAO'),
+		%persistence_migration_analysis:persistence_call(CallId, MethodCall, Receiver, Local, _, _, _, _, _, _, DAO, Business, NotBusiness, GenericDAO, 'org.sigaept.edu.dao.EnturmacaoDAO', 'org.sigaept.edu.negocio.ejb.VincularAlunoAClasseEJB', 'org.sigaept.nucleo.dao.GenericDAO'),
 		%fully_qualified_name(BusinessTarget, BusinessClass),
 		fully_qualified_name(EJB, 'javax.ejb.EJB'),
 		classT(BusinessTarget, _, NameBusinessTarget, _, Items),
@@ -18,11 +18,11 @@ user:ct( addEJBAnnotation(CallId, DAO, Business, BusinessTarget, GenericDAO),   
     ),
     (    
 		add(fieldT(NewFieldEJB, Business, BusinessTarget, NameBusinessTarget, null)),
-		add(modifierT(ModifierPrivate, NewFieldEJB, private))
+		add(modifierT(ModifierPrivate, NewFieldEJB, private)),
 		%add(annotationT(NewAnnotationEJB, NewFieldEJB, Business, EJB, [])),
 		%add(markerAnnotationT(NewAnnotationEJB)),
 		%add(preserve_markerAnnotationT(NewAnnotationEJB))
-		%add_to_class(Business, NewFieldEJB)
+		add_to_class(Business, NewFieldEJB)
 		%add(dirty_tree(Business))
     
     )

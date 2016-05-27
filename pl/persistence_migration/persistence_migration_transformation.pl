@@ -2,12 +2,12 @@
 
 :- multifile(user:ct/3).     % Don't forget the declaration!
 
-user:ct( addEJBAnnotation(CallId, DAO, Business, BusinessTarget, GenericDAO),   % HEAD
+user:ct( addEJBAnnotation(Business, BusinessTarget),   % HEAD
     (                                                   % CONDITION
 		%persistence_migration_analysis:persistence_call(CallId, MethodCall, Receiver, Local, _, _, _, _, _, _, DAO, Business, NotBusiness, GenericDAO, 'org.sigaept.edu.dao.EnturmacaoDAO', 'org.sigaept.edu.negocio.ejb.VincularAlunoAClasseEJB', 'org.sigaept.nucleo.dao.GenericDAO'),
 		%fully_qualified_name(BusinessTarget, BusinessClass),
-		fully_qualified_name(EJB, 'javax.ejb.EJB'),
-		classT(BusinessTarget, _, NameBusinessTarget, _, Items),
+		%fully_qualified_name(EJB, 'javax.ejb.EJB'),
+		classT(BusinessTarget, _, NameBusinessTarget, _, _),
 		not(fieldT(_, Business, _, NameBusinessTarget, null)),
 		
       %annotatedT(NewFieldEJB, NewAnnotationEJB),
@@ -28,7 +28,7 @@ user:ct( addEJBAnnotation(CallId, DAO, Business, BusinessTarget, GenericDAO),   
     )
 ).
 
-user:ct( addEJBAnnotationToClass(CallId, DAO, Business, BusinessTarget, GenericDAO),   % HEAD
+user:ct( addEJBAnnotationToClass(Business, BusinessTarget),   % HEAD
     (                                                   % CONDITION
 		fully_qualified_name(EJB, 'javax.ejb.EJB'),
 		classT(BusinessTarget, _, NameBusinessTarget, _, _),
@@ -53,10 +53,10 @@ user:ct( addEJBAnnotationToClass(CallId, DAO, Business, BusinessTarget, GenericD
     )
 ).
 
-user:ct( replaceDAOCallforBusinessCall(CallId, Receiver, Local, DAO, Business, BusinessTarget, GenericDAO, MethodCall, MethodCalled, MethodCalledName, MethodCalledParameters, MethodCalledReturnType, MethodCalledExceptions, CallParameters),   % HEAD
+user:ct( replaceDAOCallforBusinessCall(CallId, DAO, Business, BusinessTarget, MethodCalled, MethodCalledName, MethodCalledParameters, MethodCalledReturnType, MethodCalledExceptions, CallParameters),   % HEAD
     (                                                   % CONDITION
 		fully_qualified_name(EM, 'javax.persistence.EntityManager'),
-		fully_qualified_name(GenericCrudEJB, 'org.sigaept.nucleo.ejb.GenericCrudEJB'),
+		%fully_qualified_name(GenericCrudEJB, 'org.sigaept.nucleo.ejb.GenericCrudEJB'),
 		constructorT(Constructor, DAO, [Param], _, _, _),
 		paramT(Param, Constructor, EM, 'em'),
 		fieldT(Field, BusinessTarget, EM, _, null), 
@@ -88,7 +88,7 @@ user:ct( replaceDAOCallforBusinessCall(CallId, Receiver, Local, DAO, Business, B
 	    
 	    add(fieldAccessT(NewGetFieldEJB,_,_,_,FieldEJB,_)),
 	    
-	    replace(callT(CallId, Parent, Encl, ExprToDelete, Args, Method, TypeParams, Type), 
+	    replace(callT(CallId, Parent, Encl, _, Args, Method, TypeParams, Type), 
 	    		callT(CallId, Parent, Encl, NewGetFieldEJB, Args, Method, TypeParams, Type))
 	    		
 	    %delete(localT(Local, _, _, _, _, _)),
@@ -97,7 +97,7 @@ user:ct( replaceDAOCallforBusinessCall(CallId, Receiver, Local, DAO, Business, B
 ).
 
 
-user:ct( replaceVoidDAOCallforVoidusinessCall(CallId, Receiver, Local, DAO, Business, BusinessTarget, GenericDAO, MethodCall, MethodCalled, MethodCalledName, MethodCalledParameters, MethodCalledReturnType, MethodCalledExceptions, CallParameters),   % HEAD
+user:ct( replaceVoidDAOCallforVoidusinessCall(CallId, DAO, Business, BusinessTarget, MethodCalled, MethodCalledName, MethodCalledParameters, MethodCalledReturnType, MethodCalledExceptions, CallParameters),   % HEAD
     (                                                   % CONDITION
 		fully_qualified_name(EM, 'javax.persistence.EntityManager'),
 		fully_qualified_name(GenericCrudEJB, 'org.sigaept.nucleo.ejb.GenericCrudEJB'),
@@ -140,7 +140,7 @@ user:ct( replaceVoidDAOCallforVoidusinessCall(CallId, Receiver, Local, DAO, Busi
     )
 ).
 
-user:ct( deleteLocalVariable1(MethodCall, DAO),   % HEAD
+user:ct( deleteLocalVariable(MethodCall, DAO),   % HEAD
     (                                                   % CONDITION
     	localT(Local, Parent, MethodCall, DAO, _, _),
     	methodT(MethodCall, _, _, _, _, _, _, Block),
@@ -162,24 +162,24 @@ user:ct( deleteLocalVariable1(MethodCall, DAO),   % HEAD
     )
 ).
 
-user:ct( deleteLocalVariable(LocalVariable, MethodCall, Business, NotBusiness),   % HEAD
-    (                                                   % CONDITION
-    	localT(LocalVariable, Parent, _, _, _, _),
-    	methodT(MethodCall, _, _, _, _, _, _, Block),
-    	%blockT(Block, _, _, Items),
-    	%dirty_tree(Parent)
-		%getTerm(LocalVariable, LocalVariableTerm),
-		%removeFromBlock(Block, LocalVariable)
-		removeFromBlock(Block, LocalVariable)
-    ),
-    (    
-    	%delete(LocalVariableTerm)
-    	%add(removeFromBlock(Block, LocalVariable))
-    	%delete_subtree(LocalVariable),
-		add(dirty_tree(Parent))
-		%add(dirty_tree(MethodCall)),
-		%add(dirty_tree(Class))
-		%add(dirty_tree(Parent))
-		%add_to_class(Business,null)
-    )
-).
+%user:ct( deleteLocalVariable1(LocalVariable, MethodCall, Business, NotBusiness),   % HEAD
+%    (                                                   % CONDITION
+%    	localT(LocalVariable, Parent, _, _, _, _),
+%    	methodT(MethodCall, _, _, _, _, _, _, Block),
+%    	%blockT(Block, _, _, Items),
+%    	%dirty_tree(Parent)
+%		%getTerm(LocalVariable, LocalVariableTerm),
+%		%removeFromBlock(Block, LocalVariable)
+%		removeFromBlock(Block, LocalVariable)
+%    ),
+%    (    
+%    	%delete(LocalVariableTerm)
+%    	%add(removeFromBlock(Block, LocalVariable))
+%    	%delete_subtree(LocalVariable),
+%		add(dirty_tree(Parent))
+%		%add(dirty_tree(MethodCall)),
+%		%add(dirty_tree(Class))
+%		%add(dirty_tree(Parent))
+%		%add_to_class(Business,null)
+%    )
+%).

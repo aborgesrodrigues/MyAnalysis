@@ -4,32 +4,56 @@
 
 user:ct( addEJBAnnotation(CallId, DAO, Business, BusinessTarget, GenericDAO),   % HEAD
     (                                                   % CONDITION
-		%persistence_migration_analysis:persistence_call(CallId, MethodCall, MethodCalled, MethodCalledName, MethodCalledParameters, MethodCalledReturnType, MethodCalledExceptions, CallParameters, DAO, Business, NotBusiness, GenericDAO, DAOClass, BusinessClass, GenericClass),
+		persistence_migration_analysis:persistence_call(CallId, MethodCall, Receiver, Local, _, _, _, _, _, _, DAO, Business, NotBusiness, GenericDAO, 'org.sigaept.edu.dao.EnturmacaoDAO', 'org.sigaept.edu.negocio.ejb.VincularAlunoAClasseEJB', 'org.sigaept.nucleo.dao.GenericDAO'),
 		%fully_qualified_name(BusinessTarget, BusinessClass),
 		fully_qualified_name(EJB, 'javax.ejb.EJB'),
-		classT(BusinessTarget, _, NameBusinessTarget, _, _),
+		classT(BusinessTarget, _, NameBusinessTarget, _, Items),
 		not(fieldT(_, Business, _, NameBusinessTarget, null)),
 		
       %annotatedT(NewFieldEJB, NewAnnotationEJB),
       
       new_id(NewFieldEJB),
-      new_id(NewAnnotationEJB),
+      %new_id(NewAnnotationEJB),
       new_id(ModifierPrivate)
     ),
     (    
 		add(fieldT(NewFieldEJB, Business, BusinessTarget, NameBusinessTarget, null)),
-		add(modifierT(ModifierPrivate, NewFieldEJB, private)),
-		add(annotationT(NewAnnotationEJB, NewFieldEJB, Business, EJB, [])),
+		add(modifierT(ModifierPrivate, NewFieldEJB, private))
+		%add(annotationT(NewAnnotationEJB, NewFieldEJB, Business, EJB, [])),
 		%add(markerAnnotationT(NewAnnotationEJB)),
-		%annotatedT(NewFieldEJB, NewAnnotationEJB),
-		%add_to_class(BusinessTarget, NewAnnotationEJB),
-		add_to_class(Business, NewFieldEJB)
+		%add(preserve_markerAnnotationT(NewAnnotationEJB))
+		%add_to_class(Business, NewFieldEJB)
+		%add(dirty_tree(Business))
     
     )
 ).
 
+user:ct( addEJBAnnotationToClass(CallId, DAO, Business, BusinessTarget, GenericDAO),   % HEAD
+    (                                                   % CONDITION
+		fully_qualified_name(EJB, 'javax.ejb.EJB'),
+		classT(BusinessTarget, _, NameBusinessTarget, _, _),
+		%not(fieldT(_, Business, _, NameBusinessTarget, null)),
+		fieldT(FieldEJB, Business, BusinessTarget, NameBusinessTarget, null),
+		
+      %annotatedT(NewFieldEJB, NewAnnotationEJB),
+      
+      %new_id(NewFieldEJB),
+      new_id(NewAnnotationEJB)
+      %new_id(ModifierPrivate)
+    ),
+    (    
+		%add1(fieldT(NewFieldEJB, Business, BusinessTarget, NameBusinessTarget, null)),
+		%add(modifierT(ModifierPrivate, FieldEJB, private)),
+		add(annotationT(NewAnnotationEJB, FieldEJB, Business, EJB, [])),
+		add(markerAnnotationT(NewAnnotationEJB)),
+		add(preserve_markerAnnotationT(NewAnnotationEJB)),
+		add_to_class(Business, FieldEJB)
+		%add(dirty_tree(Business))
+    
+    )
+).
 
-user:ct( replaceDAOCallforBusinessCall(CallId, DAO, Business, BusinessTarget, GenericDAO, MethodCall, MethodCalled, MethodCalledName, MethodCalledParameters, MethodCalledReturnType, MethodCalledExceptions, CallParameters),   % HEAD
+user:ct( replaceDAOCallforBusinessCall(CallId, Receiver, Local, DAO, Business, BusinessTarget, GenericDAO, MethodCall, MethodCalled, MethodCalledName, MethodCalledParameters, MethodCalledReturnType, MethodCalledExceptions, CallParameters),   % HEAD
     (                                                   % CONDITION
 		fully_qualified_name(EM, 'javax.persistence.EntityManager'),
 		fully_qualified_name(GenericCrudEJB, 'org.sigaept.nucleo.ejb.GenericCrudEJB'),
@@ -66,22 +90,14 @@ user:ct( replaceDAOCallforBusinessCall(CallId, DAO, Business, BusinessTarget, Ge
 	    
 	    replace(callT(CallId, Parent, Encl, ExprToDelete, Args, Method, TypeParams, Type), 
 	    		callT(CallId, Parent, Encl, NewGetFieldEJB, Args, Method, TypeParams, Type))
-	    %add(identT(ExprToDelete, _, _, LocalToDelete)),
-	    %add(get_term(LocalToDelete, LocalToDeleteTerm)),
-	    %delete(fieldAccessT(NewGetFieldEJB,_,_,_,FieldEJB,_))
-	    %addToBlock(NewBlock, LocalToDelete)
-	    %deepRetract(LocalToDelete)
-	    %delete(ExprToDeleteTerm)
-		%delete(identT(ExprToDelete, _, _, LocalToDelete)),
-		%delete(LocalTermToDelete)
-	    %delete(ParentToDeleteTerm),
-	    %delete(ExprTermToDelete)
-	    %delete(callT(CallId, _, _, ExprToDelete, _, _, _, _))
+	    		
+	    %delete(localT(Local, _, _, _, _, _)),
+	    %add(dirty_tree(Receiver))
     )
 ).
 
 
-user:ct( replaceVoidDAOCallforVoidusinessCall(CallId, DAO, Business, BusinessTarget, GenericDAO, MethodCall, MethodCalled, MethodCalledName, MethodCalledParameters, MethodCalledReturnType, MethodCalledExceptions, CallParameters),   % HEAD
+user:ct( replaceVoidDAOCallforVoidusinessCall(CallId, Receiver, Local, DAO, Business, BusinessTarget, GenericDAO, MethodCall, MethodCalled, MethodCalledName, MethodCalledParameters, MethodCalledReturnType, MethodCalledExceptions, CallParameters),   % HEAD
     (                                                   % CONDITION
 		fully_qualified_name(EM, 'javax.persistence.EntityManager'),
 		fully_qualified_name(GenericCrudEJB, 'org.sigaept.nucleo.ejb.GenericCrudEJB'),
@@ -117,18 +133,53 @@ user:ct( replaceVoidDAOCallforVoidusinessCall(CallId, DAO, Business, BusinessTar
 
 	    %add(callT(NewCallEJB,_,MethodCall,NewGetFieldEJB,CallParameters,MethodCalled,[],null)),
 
-	    replace(callT(CallId, Parent, Encl, Expr, Args, Method, TypeParams, Type), 
-	    		callT(CallId, Parent, Encl, NewGetFieldEJB, Args, Method, TypeParams, Type))
+	    replace(callT(CallId, _, _, NewGetFieldEJB, _, _, _, _))
+	    
+	    %delete(localT(Local, _, _, _, _, _)),
+	    %add(dirty_tree(Receiver))
     )
 ).
 
-user:ct( deleteLocalVariable(CallId),   % HEAD
+user:ct( deleteLocalVariable1(MethodCall, DAO),   % HEAD
     (                                                   % CONDITION
-		callT(CallId, _, MethodAux, ExprToDelete, _, _, _, _),
-		%methodT(MethodAux, _, _, _, _, _, BlockAux),
-		get_term(ExprToDelete, ExprToDeleteTerm)
+    	localT(Local, Parent, MethodCall, DAO, _, _),
+    	methodT(MethodCall, _, _, _, _, _, _, Block),
+    	%blockT(Block, _, _, Items),
+    	%dirty_tree(Parent)
+		%getTerm(Local, LocalVariableTerm),
+		%removeFromBlock(Block, LocalVariable)
+		removeFromBlock(Block, Local)
     ),
     (    
-	    delete(ExprToDeleteTerm)
+    	%delete(LocalVariableTerm)
+    	%add(removeFromBlock(Block, LocalVariable))
+    	%delete_subtree(LocalVariable),
+		add(dirty_tree(Parent))
+		%add(dirty_tree(MethodCall)),
+		%add(dirty_tree(Class))
+		%add(dirty_tree(Parent))
+		%add_to_class(Business,null)
+    )
+).
+
+user:ct( deleteLocalVariable(LocalVariable, MethodCall, Business, NotBusiness),   % HEAD
+    (                                                   % CONDITION
+    	localT(LocalVariable, Parent, _, _, _, _),
+    	methodT(MethodCall, _, _, _, _, _, _, Block),
+    	%blockT(Block, _, _, Items),
+    	%dirty_tree(Parent)
+		%getTerm(LocalVariable, LocalVariableTerm),
+		%removeFromBlock(Block, LocalVariable)
+		removeFromBlock(Block, LocalVariable)
+    ),
+    (    
+    	%delete(LocalVariableTerm)
+    	%add(removeFromBlock(Block, LocalVariable))
+    	%delete_subtree(LocalVariable),
+		add(dirty_tree(Parent))
+		%add(dirty_tree(MethodCall)),
+		%add(dirty_tree(Class))
+		%add(dirty_tree(Parent))
+		%add_to_class(Business,null)
     )
 ).

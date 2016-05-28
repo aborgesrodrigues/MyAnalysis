@@ -33,8 +33,9 @@ user:ct( addEJBAnnotationToClass(Business, BusinessTarget),   % HEAD
     (                                                   % CONDITION
 		fully_qualified_name(EJB, 'javax.ejb.EJB'),
 		classT(BusinessTarget, _, NameBusinessTarget, _, _),
+		implementsT(Implements, BusinessTarget, BusinessTargetInterface),
 		%not(fieldT(_, Business, _, NameBusinessTarget, null)),
-		fieldT(FieldEJB, Business, BusinessTarget, NameBusinessTarget, null),
+		fieldT(FieldEJB, Business, BusinessTargetInterface, NameBusinessTarget, null),
 		
       %annotatedT(NewFieldEJB, NewAnnotationEJB),
       
@@ -61,10 +62,11 @@ user:ct( addNotVoidMethods(CallId, DAO, Business, BusinessTarget, MethodCalled, 
 		constructorT(Constructor, DAO, [Param], _, _, _),
 		paramT(Param, Constructor, EM, 'em'),
 		fieldT(Field, BusinessTarget, EM, _, null), 
+		%fieldT(Field, GenericCrudEJB, EM, _, null),
 		
-		classT(BusinessTarget, _, NameBusinessTarget, _, _),
+		%classT(BusinessTarget, _, NameBusinessTarget, _, _),
 		implementsT(Implements, BusinessTarget, BusinessTargetInterface),
-		fieldT(FieldEJB, Business, BusinessTargetInterface, NameBusinessTarget, null),
+		%fieldT(FieldEJB, Business, BusinessTargetInterface, NameBusinessTarget, null),
 		not(basicTypeT(MethodCalledReturnType, void)),
 		new_id(NewMethod),                                % NewTypeRefis a yet unused ID
 		new_id(ModifierP),
@@ -73,7 +75,7 @@ user:ct( addNotVoidMethods(CallId, DAO, Business, BusinessTarget, MethodCalled, 
 		new_id(NewCall),
 		new_id(NewNew),
 		new_id(NewFieldAccess),
-		new_id(NewGetFieldEJB),
+		%new_id(NewGetFieldEJB),
 		new_id(NewMethodInterface)
     ),
     (    
@@ -89,14 +91,12 @@ user:ct( addNotVoidMethods(CallId, DAO, Business, BusinessTarget, MethodCalled, 
     	
 	    add_to_class(BusinessTarget,NewMethod),
 	    
-	    add(fieldAccessT(NewGetFieldEJB,_,_,_,FieldEJB,_)),
+%	    add(fieldAccessT(NewGetFieldEJB,_,_,_,FieldEJB,_))
 	    		
 	    %add to the interface
 	    add(methodT(NewMethodInterface, BusinessTargetInterface, MethodCalledName, MethodCalledParameters, MethodCalledReturnType, MethodCalledExceptions, [], null) ),
 	    add( modifierT(ModifierP, NewMethodInterface, public)),
 	    add_to_class(BusinessTargetInterface,NewMethodInterface)
-	    %delete(localT(Local, _, _, _, _, _)),
-	    %add(dirty_tree(Receiver))
     )
 ).
 
@@ -110,7 +110,7 @@ user:ct( addVoidMethods(CallId, DAO, Business, BusinessTarget, MethodCalled, Met
 		
 		classT(BusinessTarget, _, NameBusinessTarget, _, _),
 		implementsT(Implements, BusinessTarget, BusinessTargetInterface),
-		fieldT(FieldEJB, Business, BusinessTargetInterface, NameBusinessTarget, null),
+		%fieldT(FieldEJB, Business, BusinessTargetInterface, NameBusinessTarget, null),
 		basicTypeT(MethodCalledReturnType, void),
 		
 		new_id(NewMethod),                                % NewTypeRefis a yet unused ID
@@ -134,11 +134,11 @@ user:ct( addVoidMethods(CallId, DAO, Business, BusinessTarget, MethodCalled, Met
     	
 	    add_to_class(BusinessTarget,NewMethod),
 	    
-	    add(fieldAccessT(NewGetFieldEJB,_,_,_,FieldEJB,_)),
+	    %add(fieldAccessT(NewGetFieldEJB,_,_,_,FieldEJB,_)),
 
 	    %add(callT(NewCallEJB,_,MethodCall,NewGetFieldEJB,CallParameters,MethodCalled,[],null)),
 
-	    %replace(callT(CallId, _, _, NewGetFieldEJB, _, _, _, _)),
+	    add( methodT(NewMethodInterface, BusinessTargetInterface, MethodCalledName, MethodCalledParameters, MethodCalledReturnType, MethodCalledExceptions, [], NewBlock) ),
 	    add( modifierT(ModifierP, NewMethodInterface, public)),
 	    add_to_class(BusinessTargetInterface,NewMethodInterface)
 	    

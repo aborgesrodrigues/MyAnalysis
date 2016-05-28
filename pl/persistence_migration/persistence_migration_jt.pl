@@ -32,21 +32,21 @@ analysis_api:analysis_definition(
 
 
 analysis_api:analysis_result('persistence_call', _, Result) :-  
-persistence_call(CallId, MethodCall, MethodCalled, MethodCalledName, MethodCalledParameters, MethodCalledReturnType, MethodCalledExceptions, CallParameters, DAO, Business, NotBusiness, 'org.sigaept.edu.dao.EnturmacaoDAO', 'org.sigaept.edu.negocio.ejb.VincularAlunoAClasseEJB', 'org.sigaept.nucleo.dao.GenericDAO') , 
+persistence_call(CallId, MethodCall, MethodCalled, MethodCalledName, MethodCalledParameters, MethodCalledReturnType, MethodCalledExceptions, CallParameters, DAO, Business, BusinessTarget, 'org.sigaept.edu.dao.EnturmacaoDAO', 'org.sigaept.edu.negocio.ejb.VincularAlunoAClasseEJB', 'org.sigaept.nucleo.dao.GenericDAO') , 
 Description = 'Call to DAO', 
-make_result_term(persistence_call(CallId, MethodCall, MethodCalled, MethodCalledName, MethodCalledParameters, MethodCalledReturnType, MethodCalledExceptions, CallParameters, DAO, Business, NotBusiness), Description, Result).
+make_result_term(persistence_call(CallId, MethodCall, MethodCalled, MethodCalledName, MethodCalledParameters, MethodCalledReturnType, MethodCalledExceptions, CallParameters, DAO, Business, BusinessTarget), Description, Result).
 
 
 %analysis_api:analysis_result('remove_local_variable', _, Result) :-  
-%remove_local_variable(LocalVariable, MethodCall, DAO, Business, NotBusiness, GenericDAO, 'org.sigaept.edu.dao.EnturmacaoDAO', 'org.sigaept.edu.negocio.ejb.VincularAlunoAClasseEJB', 'org.sigaept.nucleo.dao.GenericDAO') , 
+%remove_local_variable(LocalVariable, MethodCall, DAO, Business, BusinessTarget, GenericDAO, 'org.sigaept.edu.dao.EnturmacaoDAO', 'org.sigaept.edu.negocio.ejb.VincularAlunoAClasseEJB', 'org.sigaept.nucleo.dao.GenericDAO') , 
 %Description = 'Remove Local Variable', 
-%make_result_term(remove_local_variable(LocalVariable, MethodCall, DAO, Business, NotBusiness, GenericDAO), Description, Result).
+%make_result_term(remove_local_variable(LocalVariable, MethodCall, DAO, Business, BusinessTarget, GenericDAO), Description, Result).
 
 
 %analysis_api:analysis_result('teste', _, Result) :-  
-%teste(Local, MethodCalled, MethodCalledName, MethodCalledParameters, MethodCalledReturnType, MethodCalledExceptions, CallParameters, DAO, Business, NotBusiness, GenericDAO, 'org.sigaept.edu.dao.EnturmacaoDAO', 'org.sigaept.edu.negocio.ejb.VincularAlunoAClasseEJB', 'org.sigaept.nucleo.dao.GenericDAO') , 
+%teste(Local, MethodCalled, MethodCalledName, MethodCalledParameters, MethodCalledReturnType, MethodCalledExceptions, CallParameters, DAO, Business, BusinessTarget, GenericDAO, 'org.sigaept.edu.dao.EnturmacaoDAO', 'org.sigaept.edu.negocio.ejb.VincularAlunoAClasseEJB', 'org.sigaept.nucleo.dao.GenericDAO') , 
 %Description = 'Call to DAO', 
-%make_result_term(teste(CallId, MethodCall, Receiver, Local, MethodCalled, MethodCalledName, MethodCalledParameters, MethodCalledReturnType, MethodCalledExceptions, CallParameters, DAO, Business, NotBusiness, GenericDAO), Description, Result).
+%make_result_term(teste(CallId, MethodCall, Receiver, Local, MethodCalled, MethodCalledName, MethodCalledParameters, MethodCalledReturnType, MethodCalledExceptions, CallParameters, DAO, Business, BusinessTarget, GenericDAO), Description, Result).
 
 
     
@@ -57,13 +57,13 @@ make_result_term(persistence_call(CallId, MethodCall, MethodCalled, MethodCalled
 % linking the ct to the System.out.println detector
 transformation_api:transformation(
      _,                                        % Individual result (No group)
-     persistence_call(CallId, MethodCall, MethodCalled, MethodCalledName, MethodCalledParameters, MethodCalledReturnType, MethodCalledExceptions, CallParameters, DAO, Business, NotBusiness),                 % RoleTerm
+     persistence_call(CallId, MethodCall, MethodCalled, MethodCalledName, MethodCalledParameters, MethodCalledReturnType, MethodCalledExceptions, CallParameters, DAO, Business, BusinessTarget),                 % RoleTerm
      [ 
-      addEJBAnnotation(Business, NotBusiness),
+      addEJBAnnotation(Business, BusinessTarget),
       addNotVoidMethods(CallId, DAO, Business, BusinessTarget, MethodCalled, MethodCalledName, MethodCalledParameters, MethodCalledReturnType, MethodCalledExceptions, CallParameters),
       addVoidMethods(CallId, DAO, Business, BusinessTarget, MethodCalled, MethodCalledName, MethodCalledParameters, MethodCalledReturnType, MethodCalledExceptions, CallParameters),
       replaceCalls(CallId, Business, BusinessTarget),
-      addEJBAnnotationToClass(Business, NotBusiness),
+      addEJBAnnotationToClass(Business, BusinessTarget),
       deleteLocalVariable(MethodCall, DAO),
       deleteMethods1Call(Business, MethodCall, DAO)
       ],         % CTHead
@@ -73,7 +73,7 @@ transformation_api:transformation(
 
 %transformation_api:transformation(
 %     _,                                        % Individual result (No group)
-%     remove_local_variable(LocalVariable, MethodCall, DAO, Business, NotBusiness, GenericDAO),                 % RoleTerm
-%     deleteLocalVariable1(LocalVariable, MethodCall, Business, NotBusiness),         % CTHead
+%     remove_local_variable(LocalVariable, MethodCall, DAO, Business, BusinessTarget, GenericDAO),                 % RoleTerm
+%     deleteLocalVariable1(LocalVariable, MethodCall, Business, BusinessTarget),         % CTHead
 %     'Remove Local Variable',      % Description
 %     [global, preview]).                               % Option: Show Preview

@@ -6,56 +6,31 @@ user:ct( addEJBAnnotation(Business, BusinessTarget),   % HEAD
     (                                                   % CONDITION
 		%persistence_migration_analysis:persistence_call(CallId, MethodCall, Receiver, Local, _, _, _, _, _, _, DAO, Business, NotBusiness, GenericDAO, 'org.sigaept.edu.dao.EnturmacaoDAO', 'org.sigaept.edu.negocio.ejb.VincularAlunoAClasseEJB', 'org.sigaept.nucleo.dao.GenericDAO'),
 		%fully_qualified_name(BusinessTarget, BusinessClass),
-		%fully_qualified_name(EJB, 'javax.ejb.EJB'),
+		fully_qualified_name(EJB, 'javax.ejb.EJB'),
 		classT(BusinessTarget, _, NameBusinessTarget, _, _),
-		implementsT(Implements, BusinessTarget, BusinessTargetInterface),
+		implementsT(_, BusinessTarget, BusinessTargetInterface),
 		not(fieldT(_, Business, _, NameBusinessTarget, null)),
 		
       %annotatedT(NewFieldEJB, NewAnnotationEJB),
       
       new_id(NewFieldEJB),
-      %new_id(NewAnnotationEJB),
+      new_id(NewAnnotationEJB),
       new_id(ModifierPrivate)
     ),
     (    
 		add(fieldT(NewFieldEJB, Business, BusinessTargetInterface, NameBusinessTarget, null)),
 		add(modifierT(ModifierPrivate, NewFieldEJB, private)),
-		%add(annotationT(NewAnnotationEJB, NewFieldEJB, Business, EJB, [])),
-		%add(markerAnnotationT(NewAnnotationEJB)),
-		%add(preserve_markerAnnotationT(NewAnnotationEJB))
+		add(annotationT(NewAnnotationEJB, NewFieldEJB, Business, EJB, [])),
+		add(markerAnnotationT(NewAnnotationEJB)),
+		add(preserve_markerAnnotationT(NewAnnotationEJB)),
 		add_to_class(Business, NewFieldEJB)
 		%add(dirty_tree(Business))
     
     )
 ).
 
-user:ct( addEJBAnnotationToClass(Business, BusinessTarget),   % HEAD
-    (                                                   % CONDITION
-		fully_qualified_name(EJB, 'javax.ejb.EJB'),
-		classT(BusinessTarget, _, NameBusinessTarget, _, _),
-		implementsT(Implements, BusinessTarget, BusinessTargetInterface),
-		%not(fieldT(_, Business, _, NameBusinessTarget, null)),
-		fieldT(FieldEJB, Business, BusinessTargetInterface, NameBusinessTarget, null),
-		
-      %annotatedT(NewFieldEJB, NewAnnotationEJB),
-      
-      %new_id(NewFieldEJB),
-      new_id(NewAnnotationEJB)
-      %new_id(ModifierPrivate)
-    ),
-    (    
-		%add1(fieldT(NewFieldEJB, Business, BusinessTarget, NameBusinessTarget, null)),
-		%add(modifierT(ModifierPrivate, FieldEJB, private)),
-		add(annotationT(NewAnnotationEJB, FieldEJB, Business, EJB, [])),
-		add(markerAnnotationT(NewAnnotationEJB)),
-		add(preserve_markerAnnotationT(NewAnnotationEJB)),
-		add_to_class(Business, FieldEJB)
-		%add(dirty_tree(Business))
-    
-    )
-).
 
-user:ct( addNotVoidMethods(CallId, DAO, Business, BusinessTarget, MethodCalled, MethodCalledName, MethodCalledParameters, MethodCalledReturnType, MethodCalledExceptions, CallParameters),   % HEAD
+user:ct( addNotVoidMethods(DAO, BusinessTarget, MethodCalled, MethodCalledName, MethodCalledParameters, MethodCalledReturnType, MethodCalledExceptions, CallParameters),   % HEAD
     (                                                   % CONDITION
 		fully_qualified_name(EM, 'javax.persistence.EntityManager'),
 		%fully_qualified_name(GenericCrudEJB, 'org.sigaept.nucleo.ejb.GenericCrudEJB'),
@@ -65,9 +40,10 @@ user:ct( addNotVoidMethods(CallId, DAO, Business, BusinessTarget, MethodCalled, 
 		%fieldT(Field, GenericCrudEJB, EM, _, null),
 		
 		%classT(BusinessTarget, _, NameBusinessTarget, _, _),
-		implementsT(Implements, BusinessTarget, BusinessTargetInterface),
+		implementsT(_, BusinessTarget, BusinessTargetInterface),
 		%fieldT(FieldEJB, Business, BusinessTargetInterface, NameBusinessTarget, null),
 		not(basicTypeT(MethodCalledReturnType, void)),
+		not(methodT(_, BusinessTarget, MethodCalledName, MethodCalledParameters, MethodCalledReturnType, MethodCalledExceptions, [], _)),
 		new_id(NewMethod),                                % NewTypeRefis a yet unused ID
 		new_id(ModifierP),
 		new_id(NewBlock),
@@ -100,50 +76,45 @@ user:ct( addNotVoidMethods(CallId, DAO, Business, BusinessTarget, MethodCalled, 
     )
 ).
 
-user:ct( addVoidMethods(CallId, DAO, Business, BusinessTarget, MethodCalled, MethodCalledName, MethodCalledParameters, MethodCalledReturnType, MethodCalledExceptions, CallParameters),   % HEAD
+user:ct( addVoidMethods(DAO, BusinessTarget, MethodCalled, MethodCalledName, MethodCalledParameters, MethodCalledReturnType, MethodCalledExceptions, CallParameters),   % HEAD
     (                                                   % CONDITION
 		fully_qualified_name(EM, 'javax.persistence.EntityManager'),
-		fully_qualified_name(GenericCrudEJB, 'org.sigaept.nucleo.ejb.GenericCrudEJB'),
 		constructorT(Constructor, DAO, [Param], _, _, _),
 		paramT(Param, Constructor, EM, 'em'),
-		fieldT(Field, GenericCrudEJB, EM, _, null),% ; fieldT(Field, BusinessTarget, EM, 'em', null)),
-		
-		classT(BusinessTarget, _, NameBusinessTarget, _, _),
-		implementsT(Implements, BusinessTarget, BusinessTargetInterface),
-		%fieldT(FieldEJB, Business, BusinessTargetInterface, NameBusinessTarget, null),
+		fieldT(Field, BusinessTarget, EM, _, null), 
+
+		implementsT(_, BusinessTarget, BusinessTargetInterface),
 		basicTypeT(MethodCalledReturnType, void),
-		
+		not(methodT(_, BusinessTarget, MethodCalledName, MethodCalledParameters, MethodCalledReturnType, MethodCalledExceptions, [], _)),
 		new_id(NewMethod),                                % NewTypeRefis a yet unused ID
 		new_id(ModifierP),
 		new_id(NewBlock),
+		new_id(NewExec),
 		new_id(NewCall),
 		new_id(NewNew),
 		new_id(NewFieldAccess),
-		new_id(NewGetFieldEJB),
+		%new_id(NewGetFieldEJB),
 		new_id(NewMethodInterface)
     ),
     (    
     	add(fieldAccessT(NewFieldAccess,_,_,_,Field,_)),
     	add( methodT(NewMethod, BusinessTarget, MethodCalledName, MethodCalledParameters, MethodCalledReturnType, MethodCalledExceptions, [], NewBlock) ),
     	add( modifierT(ModifierP, NewMethod, public)),
-    	add(blockT(NewBlock, NewMethod, NewMethod, [NewCall])),
+    	add(blockT(NewBlock, NewMethod, NewMethod, [NewExec])),
 
     	add(newT(NewNew,NewBlock,NewMethod,null,[NewFieldAccess],Constructor,[],DAO,null)),
 
-    	add(callT(NewCall,NewBlock,NewMethod,NewNew,CallParameters,MethodCalled,[],null)),
+    	add(execT(NewExec, NewBlock,NewMethod, NewCall)),
+    	add(callT(NewCall,NewExec,NewMethod,NewNew,CallParameters,MethodCalled,[],null)),
     	
 	    add_to_class(BusinessTarget,NewMethod),
 	    
-	    %add(fieldAccessT(NewGetFieldEJB,_,_,_,FieldEJB,_)),
-
-	    %add(callT(NewCallEJB,_,MethodCall,NewGetFieldEJB,CallParameters,MethodCalled,[],null)),
-
-	    add( methodT(NewMethodInterface, BusinessTargetInterface, MethodCalledName, MethodCalledParameters, MethodCalledReturnType, MethodCalledExceptions, [], NewBlock) ),
+%	    add(fieldAccessT(NewGetFieldEJB,_,_,_,FieldEJB,_))
+	    		
+	    %add to the interface
+	    add(methodT(NewMethodInterface, BusinessTargetInterface, MethodCalledName, MethodCalledParameters, MethodCalledReturnType, MethodCalledExceptions, [], null) ),
 	    add( modifierT(ModifierP, NewMethodInterface, public)),
 	    add_to_class(BusinessTargetInterface,NewMethodInterface)
-	    
-	    %delete(localT(Local, _, _, _, _, _)),
-	    %add(dirty_tree(Receiver))
     )
 ).
 
@@ -155,7 +126,7 @@ user:ct( replaceCalls(CallId, Business, BusinessTarget),   % HEAD
 %		paramT(Param, Constructor, EM, 'em'),
 %		fieldT(Field, GenericCrudEJB, EM, _, null),
 		classT(BusinessTarget, _, NameBusinessTarget, _, _),
-		implementsT(Implements, BusinessTarget, BusinessTargetInterface),
+		implementsT(_, BusinessTarget, BusinessTargetInterface),
 		fieldT(FieldEJB, Business, BusinessTargetInterface, NameBusinessTarget, null),
 
 		new_id(NewGetFieldEJB)
@@ -179,7 +150,7 @@ user:ct( replaceVoidDAOCallforVoidusinessCall(CallId, DAO, Business, BusinessTar
 		fieldT(Field, GenericCrudEJB, EM, _, null),% ; fieldT(Field, BusinessTarget, EM, 'em', null)),
 		
 		classT(BusinessTarget, _, NameBusinessTarget, _, _),
-		implementsT(Implements, BusinessTarget, BusinessTargetInterface),
+		implementsT(_, BusinessTarget, BusinessTargetInterface),
 		fieldT(FieldEJB, Business, BusinessTargetInterface, NameBusinessTarget, null),
 		basicTypeT(MethodCalledReturnType, void),
 		

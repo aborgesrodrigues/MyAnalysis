@@ -60,8 +60,9 @@ transformation_api:transformation(
      persistence_call(CallId, MethodCall, MethodCalled, MethodCalledName, MethodCalledParameters, MethodCalledReturnType, MethodCalledExceptions, CallParameters, DAO, Business, NotBusiness),                 % RoleTerm
      [ 
       addEJBAnnotation(Business, NotBusiness),
-      replaceDAOCallforBusinessCall(CallId, DAO, Business, BusinessTarget, MethodCalled, MethodCalledName, MethodCalledParameters, MethodCalledReturnType, MethodCalledExceptions, CallParameters),
-      replaceVoidDAOCallforVoidusinessCall(CallId, DAO, Business, BusinessTarget, MethodCalled, MethodCalledName, MethodCalledParameters, MethodCalledReturnType, MethodCalledExceptions, CallParameters),
+      addNotVoidMethods(CallId, DAO, Business, BusinessTarget, MethodCalled, MethodCalledName, MethodCalledParameters, MethodCalledReturnType, MethodCalledExceptions, CallParameters),
+      addVoidMethods(CallId, DAO, Business, BusinessTarget, MethodCalled, MethodCalledName, MethodCalledParameters, MethodCalledReturnType, MethodCalledExceptions, CallParameters),
+      replaceCalls(CallId, Business, BusinessTarget),
       addEJBAnnotationToClass(Business, NotBusiness),
       deleteLocalVariable(MethodCall, DAO),
       deleteMethods1Call(Business, MethodCall, DAO)

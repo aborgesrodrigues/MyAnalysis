@@ -63,7 +63,8 @@ transformation_api:transformation(
       replaceDAOCallforBusinessCall(CallId, DAO, Business, BusinessTarget, MethodCalled, MethodCalledName, MethodCalledParameters, MethodCalledReturnType, MethodCalledExceptions, CallParameters),
       replaceVoidDAOCallforVoidusinessCall(CallId, DAO, Business, BusinessTarget, MethodCalled, MethodCalledName, MethodCalledParameters, MethodCalledReturnType, MethodCalledExceptions, CallParameters),
       addEJBAnnotationToClass(Business, NotBusiness),
-      deleteLocalVariable(MethodCall, DAO)
+      deleteLocalVariable(MethodCall, DAO),
+      deleteMethods1Call(Business, MethodCall, DAO)
       ],         % CTHead
      'Replace DAO call for EJB call',      % Description
      [global, preview]).                               % Option: Show Preview

@@ -162,24 +162,16 @@ user:ct( deleteLocalVariable(MethodCall, DAO),   % HEAD
     )
 ).
 
-%user:ct( deleteLocalVariable1(LocalVariable, MethodCall, Business, NotBusiness),   % HEAD
-%    (                                                   % CONDITION
-%    	localT(LocalVariable, Parent, _, _, _, _),
-%    	methodT(MethodCall, _, _, _, _, _, _, Block),
-%    	%blockT(Block, _, _, Items),
-%    	%dirty_tree(Parent)
-%		%getTerm(LocalVariable, LocalVariableTerm),
-%		%removeFromBlock(Block, LocalVariable)
-%		removeFromBlock(Block, LocalVariable)
-%    ),
-%    (    
-%    	%delete(LocalVariableTerm)
-%    	%add(removeFromBlock(Block, LocalVariable))
-%    	%delete_subtree(LocalVariable),
-%		add(dirty_tree(Parent))
-%		%add(dirty_tree(MethodCall)),
-%		%add(dirty_tree(Class))
-%		%add(dirty_tree(Parent))
-%		%add_to_class(Business,null)
-%    )
-%).
+user:ct( deleteMethods1Call(Business, MethodCall, BusinessTarget),   % HEAD
+    (                                                   % CONDITION
+    	methodT(MethodCall, _, _, _, _, _, _, Block),
+    	blockT(Block, _, _, [Expr]),
+    	(returnT(Expr, _, _, Call); execT(Expr, _, _, Call)),
+    	callT(Call, _, _, FieldAcess, _, _, _, _),
+    	fieldAccessT(FieldAcess, _, _, _, _, BusinessTarget)
+    	%newT(New, _, _, _, _, _, _, DAO, _)
+    ),
+    (    
+    	remove_from_class(Business, MethodCall)
+    )
+).

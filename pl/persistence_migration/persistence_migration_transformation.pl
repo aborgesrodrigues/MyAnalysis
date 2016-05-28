@@ -8,6 +8,7 @@ user:ct( addEJBAnnotation(Business, BusinessTarget),   % HEAD
 		%fully_qualified_name(BusinessTarget, BusinessClass),
 		%fully_qualified_name(EJB, 'javax.ejb.EJB'),
 		classT(BusinessTarget, _, NameBusinessTarget, _, _),
+		implementsT(Implements, BusinessTarget, BusinessTargetInterface),
 		not(fieldT(_, Business, _, NameBusinessTarget, null)),
 		
       %annotatedT(NewFieldEJB, NewAnnotationEJB),
@@ -17,7 +18,7 @@ user:ct( addEJBAnnotation(Business, BusinessTarget),   % HEAD
       new_id(ModifierPrivate)
     ),
     (    
-		add(fieldT(NewFieldEJB, Business, BusinessTarget, NameBusinessTarget, null)),
+		add(fieldT(NewFieldEJB, Business, BusinessTargetInterface, NameBusinessTarget, null)),
 		add(modifierT(ModifierPrivate, NewFieldEJB, private)),
 		%add(annotationT(NewAnnotationEJB, NewFieldEJB, Business, EJB, [])),
 		%add(markerAnnotationT(NewAnnotationEJB)),
@@ -62,7 +63,8 @@ user:ct( replaceDAOCallforBusinessCall(CallId, DAO, Business, BusinessTarget, Me
 		fieldT(Field, BusinessTarget, EM, _, null), 
 		
 		classT(BusinessTarget, _, NameBusinessTarget, _, _),
-		fieldT(FieldEJB, Business, BusinessTarget, NameBusinessTarget, null),
+		implementsT(Implements, BusinessTarget, BusinessTargetInterface),
+		fieldT(FieldEJB, Business, BusinessTargetInterface, NameBusinessTarget, null),
 		not(basicTypeT(MethodCalledReturnType, void)),
 		new_id(NewMethod),                                % NewTypeRefis a yet unused ID
 		new_id(ModifierP),
@@ -71,7 +73,8 @@ user:ct( replaceDAOCallforBusinessCall(CallId, DAO, Business, BusinessTarget, Me
 		new_id(NewCall),
 		new_id(NewNew),
 		new_id(NewFieldAccess),
-		new_id(NewGetFieldEJB)
+		new_id(NewGetFieldEJB),
+		new_id(NewMethodInterface)
     ),
     (    
     	add(fieldAccessT(NewFieldAccess,_,_,_,Field,_)),
@@ -89,8 +92,12 @@ user:ct( replaceDAOCallforBusinessCall(CallId, DAO, Business, BusinessTarget, Me
 	    add(fieldAccessT(NewGetFieldEJB,_,_,_,FieldEJB,_)),
 	    
 	    replace(callT(CallId, Parent, Encl, _, Args, Method, TypeParams, Type), 
-	    		callT(CallId, Parent, Encl, NewGetFieldEJB, Args, Method, TypeParams, Type))
+	    		callT(CallId, Parent, Encl, NewGetFieldEJB, Args, Method, TypeParams, Type)),
 	    		
+	    %add to the interface
+	    add(methodT(NewMethodInterface, BusinessTargetInterface, MethodCalledName, MethodCalledParameters, MethodCalledReturnType, MethodCalledExceptions, [], null) ),
+	    add( modifierT(ModifierP, NewMethodInterface, public)),
+	    add_to_class(BusinessTargetInterface,NewMethodInterface)
 	    %delete(localT(Local, _, _, _, _, _)),
 	    %add(dirty_tree(Receiver))
     )
@@ -106,16 +113,18 @@ user:ct( replaceVoidDAOCallforVoidusinessCall(CallId, DAO, Business, BusinessTar
 		fieldT(Field, GenericCrudEJB, EM, _, null),% ; fieldT(Field, BusinessTarget, EM, 'em', null)),
 		
 		classT(BusinessTarget, _, NameBusinessTarget, _, _),
-		fieldT(FieldEJB, Business, BusinessTarget, NameBusinessTarget, null),
+		implementsT(Implements, BusinessTarget, BusinessTargetInterface),
+		fieldT(FieldEJB, Business, BusinessTargetInterface, NameBusinessTarget, null),
 		basicTypeT(MethodCalledReturnType, void),
 		
-      new_id(NewMethod),                                % NewTypeRefis a yet unused ID
-      new_id(ModifierP),
-      new_id(NewBlock),
-      new_id(NewCall),
-      new_id(NewNew),
-      new_id(NewFieldAccess),
-      new_id(NewGetFieldEJB)
+		new_id(NewMethod),                                % NewTypeRefis a yet unused ID
+		new_id(ModifierP),
+		new_id(NewBlock),
+		new_id(NewCall),
+		new_id(NewNew),
+		new_id(NewFieldAccess),
+		new_id(NewGetFieldEJB),
+		new_id(NewMethodInterface)
     ),
     (    
     	add(fieldAccessT(NewFieldAccess,_,_,_,Field,_)),
@@ -133,7 +142,9 @@ user:ct( replaceVoidDAOCallforVoidusinessCall(CallId, DAO, Business, BusinessTar
 
 	    %add(callT(NewCallEJB,_,MethodCall,NewGetFieldEJB,CallParameters,MethodCalled,[],null)),
 
-	    replace(callT(CallId, _, _, NewGetFieldEJB, _, _, _, _))
+	    replace(callT(CallId, _, _, NewGetFieldEJB, _, _, _, _)),
+	    add( modifierT(ModifierP, NewMethodInterface, public)),
+	    add_to_class(BusinessTargetInterface,NewMethodInterface)
 	    
 	    %delete(localT(Local, _, _, _, _, _)),
 	    %add(dirty_tree(Receiver))

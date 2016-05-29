@@ -57,7 +57,9 @@ transformation_api:transformation(
       replaceCalls(CallId, Business, BusinessTarget),
       %addEJBAnnotationToClass(Business, BusinessTarget),
       deleteLocalVariable(MethodCall, DAO),
-      deleteMethods1Call(Business, MethodCall, DAO)
+      deleteMethods1Call(Business, MethodCall, DAO),
+      organizeImportsEJB(Business),
+      organizeImportsEJB(Business, BusinessTarget)
       ],         % CTHead
      'Replace DAO call for EJB call',      % Description
      [global, preview]).                               % Option: Show Preview

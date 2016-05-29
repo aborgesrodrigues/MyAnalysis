@@ -176,15 +176,10 @@ user:ct( replaceVoidDAOCallforVoidusinessCall(CallId, DAO, Business, BusinessTar
 	    add_to_class(BusinessTarget,NewMethod),
 	    
 	    add(fieldAccessT(NewGetFieldEJB,_,_,_,FieldEJB,_)),
-
-	    %add(callT(NewCallEJB,_,MethodCall,NewGetFieldEJB,CallParameters,MethodCalled,[],null)),
-
+	    
 	    replace(callT(CallId, _, _, NewGetFieldEJB, _, _, _, _)),
 	    add( modifierT(ModifierP, NewMethodInterface, public)),
 	    add_to_class(BusinessTargetInterface,NewMethodInterface)
-	    
-	    %delete(localT(Local, _, _, _, _, _)),
-	    %add(dirty_tree(Receiver))
     )
 ).
 
@@ -194,21 +189,10 @@ user:ct( deleteLocalVariable(MethodCall, DAO),   % HEAD
     (                                                   % CONDITION
     	localT(Local, Parent, MethodCall, DAO, _, _),
     	methodT(MethodCall, _, _, _, _, _, _, Block),
-    	%blockT(Block, _, _, Items),
-    	%dirty_tree(Parent)
-		%getTerm(Local, LocalVariableTerm),
-		%removeFromBlock(Block, LocalVariable)
 		removeFromBlock(Block, Local)
     ),
     (    
-    	%delete(LocalVariableTerm)
-    	%add(removeFromBlock(Block, LocalVariable))
-    	%delete_subtree(LocalVariable),
 		add(dirty_tree(Parent))
-		%add(dirty_tree(MethodCall)),
-		%add(dirty_tree(Class))
-		%add(dirty_tree(Parent))
-		%add_to_class(Business,null)
     )
 ).
 
@@ -223,5 +207,29 @@ user:ct( deleteMethods1Call(Business, MethodCall, BusinessTarget),   % HEAD
     ),
     (    
     	remove_from_class(Business, MethodCall)
+    )
+).
+
+user:ct( organizeImportsEJB(Business),   % HEAD
+    (                                                   % CONDITION
+    	fully_qualified_name(EJB, 'javax.ejb.EJB'),
+    	not(importT(_, Business, EJB)),
+    	new_id(NewImport)
+    ),
+    (    
+    	add(importT(NewImport, Business, EJB)),
+    	add_to_class(Business, NewImport)
+    )
+).
+
+user:ct( organizeImportsEJB(Business, BusinessTarget),   % HEAD
+    (                                                   % CONDITION
+    	implementsT(_, BusinessTarget, BusinessTargetInterface),
+    	not(importT(_, Business, BusinessTargetInterface)),
+    	new_id(NewImport)
+    ),
+    (    
+    	add(importT(NewImport, Business, BusinessTargetInterface)),
+    	add_to_class(Business, NewImport)
     )
 ).

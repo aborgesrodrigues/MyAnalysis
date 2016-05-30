@@ -157,6 +157,7 @@ user:ct( deleteLocalVariable(MethodCall, DAO),   % HEAD
 user:ct( deleteMethods1Call(Business, MethodCall, BusinessTarget),   % HEAD
     (                                                   % CONDITION
     	methodT(MethodCall, _, _, _, _, _, _, Block),
+    	implementsT(_, Business, BusinessInterface),
     	blockT(Block, _, _, [Expr]),
     	(returnT(Expr, _, _, Call); execT(Expr, _, _, Call)),
     	callT(Call, _, _, FieldAcess, _, _, _, _),
@@ -164,7 +165,8 @@ user:ct( deleteMethods1Call(Business, MethodCall, BusinessTarget),   % HEAD
     	%newT(New, _, _, _, _, _, _, DAO, _)
     ),
     (    
-    	remove_from_class(Business, MethodCall)
+    	remove_from_class(Business, MethodCall),
+    	remove_from_class(BusinessInterface, MethodCall)
     )
 ).
 

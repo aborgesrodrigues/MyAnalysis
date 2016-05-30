@@ -141,54 +141,12 @@ user:ct( replaceCalls(CallId, Business, BusinessTarget),   % HEAD
 ).
 
 
-user:ct( replaceVoidDAOCallforVoidusinessCall(CallId, DAO, Business, BusinessTarget, MethodCalled, MethodCalledName, MethodCalledParameters, MethodCalledReturnType, MethodCalledExceptions, CallParameters),   % HEAD
-    (                                                   % CONDITION
-		fully_qualified_name(EM, 'javax.persistence.EntityManager'),
-		fully_qualified_name(GenericCrudEJB, 'org.sigaept.nucleo.ejb.GenericCrudEJB'),
-		constructorT(Constructor, DAO, [Param], _, _, _),
-		paramT(Param, Constructor, EM, 'em'),
-		fieldT(Field, GenericCrudEJB, EM, _, null),% ; fieldT(Field, BusinessTarget, EM, 'em', null)),
-		
-		classT(BusinessTarget, _, NameBusinessTarget, _, _),
-		implementsT(_, BusinessTarget, BusinessTargetInterface),
-		fieldT(FieldEJB, Business, BusinessTargetInterface, NameBusinessTarget, null),
-		basicTypeT(MethodCalledReturnType, void),
-		
-		new_id(NewMethod),                                % NewTypeRefis a yet unused ID
-		new_id(ModifierP),
-		new_id(NewBlock),
-		new_id(NewCall),
-		new_id(NewNew),
-		new_id(NewFieldAccess),
-		new_id(NewGetFieldEJB),
-		new_id(NewMethodInterface)
-    ),
-    (    
-    	add(fieldAccessT(NewFieldAccess,_,_,_,Field,_)),
-    	add( methodT(NewMethod, BusinessTarget, MethodCalledName, MethodCalledParameters, MethodCalledReturnType, MethodCalledExceptions, [], NewBlock) ),
-    	add( modifierT(ModifierP, NewMethod, public)),
-    	add(blockT(NewBlock, NewMethod, NewMethod, [NewCall])),
-
-    	add(newT(NewNew,NewBlock,NewMethod,null,[NewFieldAccess],Constructor,[],DAO,null)),
-
-    	add(callT(NewCall,NewBlock,NewMethod,NewNew,CallParameters,MethodCalled,[],null)),
-    	
-	    add_to_class(BusinessTarget,NewMethod),
-	    
-	    add(fieldAccessT(NewGetFieldEJB,_,_,_,FieldEJB,_)),
-	    
-	    replace(callT(CallId, _, _, NewGetFieldEJB, _, _, _, _)),
-	    add( modifierT(ModifierP, NewMethodInterface, public)),
-	    add_to_class(BusinessTargetInterface,NewMethodInterface)
-    )
-).
-
-
-
 user:ct( deleteLocalVariable(MethodCall, DAO),   % HEAD
     (                                                   % CONDITION
     	localT(Local, Parent, MethodCall, DAO, _, _),
     	methodT(MethodCall, _, _, _, _, _, _, Block),
+    	%not(callT(_, _, _, Local, _, _, _, _)),
+    	%not(identT(_, _, MethodCall, Local)),
 		removeFromBlock(Block, Local)
     ),
     (    

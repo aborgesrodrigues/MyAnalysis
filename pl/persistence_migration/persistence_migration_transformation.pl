@@ -30,20 +30,27 @@ user:ct( addEJBAnnotation(Business, BusinessTarget),   % HEAD
 ).
 
 
-user:ct( addNotVoidMethods(DAO, BusinessTarget, MethodCalled, MethodCalledName, MethodCalledParameters, MethodCalledReturnType, MethodCalledExceptions, CallParameters),   % HEAD
+user:ct( addNotVoidMethods(DAO, BusinessTarget, MethodCalled, MethodCalledName, MethodCalledParameters, MethodCalledReturnType, MethodCalledExceptions, MethodCalledTypeParameters, CallParameters),   % HEAD
     (                                                   % CONDITION
 		fully_qualified_name(EM, 'javax.persistence.EntityManager'),
-		%fully_qualified_name(GenericCrudEJB, 'org.sigaept.nucleo.ejb.GenericCrudEJB'),
+		%,
 		constructorT(Constructor, DAO, [Param], _, _, _),
 		paramT(Param, Constructor, EM, 'em'),
-		fieldT(Field, BusinessTarget, EM, _, null), 
-		%fieldT(Field, GenericCrudEJB, EM, _, null),
+		(
+		 not(fieldT(Field, BusinessTarget, EM, _, null)),
+		 fully_qualified_name(GenericCrudEJB, 'org.sigaept.nucleo.ejb.GenericCrudEJB'),
+		 fieldT(Field, GenericCrudEJB, EM, _, null) 
+		;
+		(
+		 fieldT(Field, BusinessTarget, EM, _, null)
+		)), 
+		%,
 		
 		%classT(BusinessTarget, _, NameBusinessTarget, _, _),
 		implementsT(_, BusinessTarget, BusinessTargetInterface),
 		%fieldT(FieldEJB, Business, BusinessTargetInterface, NameBusinessTarget, null),
 		not(basicTypeT(MethodCalledReturnType, void)),
-		not(methodT(_, BusinessTarget, MethodCalledName, MethodCalledParameters, MethodCalledReturnType, MethodCalledExceptions, [], _)),
+		not(methodT(_, BusinessTarget, MethodCalledName, MethodCalledParameters, MethodCalledReturnType, _, MethodCalledTypeParameters, _)),
 		new_id(NewMethod),                                % NewTypeRefis a yet unused ID
 		new_id(ModifierP),
 		new_id(NewBlock),
@@ -56,7 +63,7 @@ user:ct( addNotVoidMethods(DAO, BusinessTarget, MethodCalled, MethodCalledName, 
     ),
     (    
     	add(fieldAccessT(NewFieldAccess,_,_,_,Field,_)),
-    	add( methodT(NewMethod, BusinessTarget, MethodCalledName, MethodCalledParameters, MethodCalledReturnType, MethodCalledExceptions, [], NewBlock) ),
+    	add( methodT(NewMethod, BusinessTarget, MethodCalledName, MethodCalledParameters, MethodCalledReturnType, MethodCalledExceptions, MethodCalledTypeParameters, NewBlock) ),
     	add( modifierT(ModifierP, NewMethod, public)),
     	add(blockT(NewBlock, NewMethod, NewMethod, [NewReturn])),
 
@@ -76,16 +83,23 @@ user:ct( addNotVoidMethods(DAO, BusinessTarget, MethodCalled, MethodCalledName, 
     )
 ).
 
-user:ct( addVoidMethods(DAO, BusinessTarget, MethodCalled, MethodCalledName, MethodCalledParameters, MethodCalledReturnType, MethodCalledExceptions, CallParameters),   % HEAD
+user:ct( addVoidMethods(DAO, BusinessTarget, MethodCalled, MethodCalledName, MethodCalledParameters, MethodCalledReturnType, MethodCalledExceptions, MethodCalledTypeParameters, CallParameters),   % HEAD
     (                                                   % CONDITION
 		fully_qualified_name(EM, 'javax.persistence.EntityManager'),
 		constructorT(Constructor, DAO, [Param], _, _, _),
 		paramT(Param, Constructor, EM, 'em'),
-		fieldT(Field, BusinessTarget, EM, _, null), 
+		(
+		 not(fieldT(Field, BusinessTarget, EM, _, null)),
+		 fully_qualified_name(GenericCrudEJB, 'org.sigaept.nucleo.ejb.GenericCrudEJB'),
+		 fieldT(Field, GenericCrudEJB, EM, _, null) 
+		;
+		(
+		 fieldT(Field, BusinessTarget, EM, _, null)
+		)), 
 
 		implementsT(_, BusinessTarget, BusinessTargetInterface),
 		basicTypeT(MethodCalledReturnType, void),
-		not(methodT(_, BusinessTarget, MethodCalledName, MethodCalledParameters, MethodCalledReturnType, MethodCalledExceptions, [], _)),
+		not(methodT(_, BusinessTarget, MethodCalledName, MethodCalledParameters, MethodCalledReturnType, MethodCalledExceptions, MethodCalledTypeParameters, _)),
 		new_id(NewMethod),                                % NewTypeRefis a yet unused ID
 		new_id(ModifierP),
 		new_id(NewBlock),
@@ -98,7 +112,7 @@ user:ct( addVoidMethods(DAO, BusinessTarget, MethodCalled, MethodCalledName, Met
     ),
     (    
     	add(fieldAccessT(NewFieldAccess,_,_,_,Field,_)),
-    	add( methodT(NewMethod, BusinessTarget, MethodCalledName, MethodCalledParameters, MethodCalledReturnType, MethodCalledExceptions, [], NewBlock) ),
+    	add( methodT(NewMethod, BusinessTarget, MethodCalledName, MethodCalledParameters, MethodCalledReturnType, MethodCalledExceptions, MethodCalledTypeParameters, NewBlock) ),
     	add( modifierT(ModifierP, NewMethod, public)),
     	add(blockT(NewBlock, NewMethod, NewMethod, [NewExec])),
 
@@ -156,7 +170,9 @@ user:ct( deleteLocalVariable(MethodCall, DAO),   % HEAD
 
 user:ct( deleteMethods1Call(Business, MethodCall, BusinessTarget),   % HEAD
     (                                                   % CONDITION
-    	methodT(MethodCall, _, _, _, _, _, _, Block),
+%    	methodT(MethodCall, _, _, _, _, _, _, Block),
+    	methodT(MethodCall, _, MethodCallName, MethodCallParameters, MethodCallType, MethodCallExceptions, MethodCallTypeParameters, Block),
+    	methodT(MethodCallInterface, BusinessInterface, MethodCallName, _, MethodCallType, _, MethodCallTypeParameters, _),
     	implementsT(_, Business, BusinessInterface),
     	blockT(Block, _, _, [Expr]),
     	(returnT(Expr, _, _, Call); execT(Expr, _, _, Call)),
@@ -166,7 +182,7 @@ user:ct( deleteMethods1Call(Business, MethodCall, BusinessTarget),   % HEAD
     ),
     (    
     	remove_from_class(Business, MethodCall),
-    	remove_from_class(BusinessInterface, MethodCall)
+    	remove_from_class(BusinessInterface, MethodCallInterface)%corrigir método
     )
 ).
 

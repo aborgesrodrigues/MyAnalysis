@@ -7,7 +7,13 @@ persistence_call(CallId, MethodCall, MethodCalled, MethodCalledName, MethodCalle
   methodT(MethodCalled, _, MethodCalledName, MethodCalledParameters, MethodCalledReturnType, MethodCalledExceptions, MethodCalledTypeParameters, _),
   fully_qualified_name(GenericDAO, GenericDAOClass),
   fully_qualified_name(DAO,DAOClass),
-  ((identT(Receiver, CallId, MethodCall, Local), localT(Local, _, _, DAO, _, _)) ; newT(Receiver, _, _, _, _, _, _, DAO, _)),
+  (
+   (identT(Receiver, CallId, MethodCall, Local), localT(Local, _, _, DAO, _, _)) 
+   ; 
+   newT(Receiver, _, _, _, _, _, _, DAO, _)
+   ;
+   callT(Receiver, _, _, _, _, _, _, DAO)
+  ),
   %subtype(DAO, GenericDAO),
   % limit the scope
   methodT(MethodCall, Business, _, _, _, _, _, _),
